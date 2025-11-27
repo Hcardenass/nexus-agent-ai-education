@@ -1,6 +1,6 @@
 # 🎓 Edu-Nexus: Asistente Académico con IA
 
-> Sistema inteligente de educación que combina RAG (Retrieval Augmented Generation), múltiples LLMs, y generación automática de presentaciones con imágenes AI.
+> Plataforma educativa inteligente que combina RAG (Retrieval Augmented Generation) con múltiples LLMs para generar automáticamente recursos pedagógicos: rúbricas, exámenes, planes de clase, presentaciones con imágenes AI, y más. Carga tus sílabos y deja que la IA cree contenido educativo personalizado.
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.0-green.svg)](https://fastapi.tiangolo.com/)
@@ -10,23 +10,25 @@
 
 ## 🚀 Características Principales
 
+### 📚 **Generación Automática de Recursos Pedagógicos**
+- **Rúbricas de evaluación** personalizadas por competencias
+- **Exámenes y quizzes** con preguntas contextualizadas
+- **Planes de clase** estructurados con objetivos y actividades
+- **Exámenes prácticos** con casos de estudio
+- **Presentaciones PowerPoint** con imágenes generadas por DALL-E 2/3
+- Todo basado en el contenido de tus sílabos
+
 ### 💬 **Chat Inteligente con RAG**
-- Respuestas contextualizadas basadas en sílabos académicos
+- Respuestas contextualizadas desde sílabos académicos
 - Soporte para múltiples LLMs (OpenAI GPT-4, Gemini 2.5, HuggingFace)
 - Historial de conversaciones con Redis
-- Fine-tuning con LoRA para respuestas pedagógicas
-
-### 📊 **Generación Automática de Presentaciones**
-- Creación de slides profesionales en PowerPoint
-- Imágenes generadas con DALL-E 2/3
-- Diseño moderno con iconos y colores personalizados
-- Contenido extraído automáticamente del sílabo
+- Fine-tuning con LoRA (Phi-2, Llama-3.2, TinyLlama) para tono pedagógico
 
 ### 🎯 **Gestión de Sílabos**
-- Carga y procesamiento de múltiples sílabos
+- Carga y procesamiento de PDFs (sílabos, reglamentos, manuales)
 - Búsqueda semántica con FAISS
 - Embeddings con OpenAI o HuggingFace
-- Cambio dinámico entre sílabos
+- Cambio dinámico entre múltiples sílabos
 
 ---
 
@@ -221,9 +223,13 @@ nexus-agent-ai-education/
 │   ├── data_science/
 │   └── historia/
 ├── fine_tuning/                # Fine-tuning LoRA
-│   ├── dataset_pedagogico.json
-│   ├── lora_adapters/
-│   └── notebooks/
+│   ├── dataset_pedagogico.json  # Dataset de 30 ejemplos pedagógicos
+│   ├── lora_adapters/          # Adaptadores entrenados (30 ejemplos, GPU T4)
+│   │   ├── lora_adapters_tinyllama/  # TinyLlama 1.1B - 20 épocas (Loss: 1.157)
+│   │   ├── lora_adapters_phi2/       # Phi-2 2.7B - 15 épocas (Loss: 0.818) 🥇
+│   │   └── lora_adapters_llama3/     # Llama-3.2-1B - 10 épocas (Loss: 0.858)
+│   └── notebooks/              # Notebooks de entrenamiento
+│       └── ENTRENAMIENTO_COMPARATIVO.ipynb
 ├── presentations/              # PPTs generados
 ├── Dockerfile                  # Imagen Docker
 ├── docker-compose.yml          # Orquestación local
@@ -231,6 +237,42 @@ nexus-agent-ai-education/
 ├── main.py                     # Punto de entrada
 └── README.md                   # Este archivo
 ```
+
+---
+
+## 🧪 Resultados del Fine-Tuning
+
+### **Comparación de Modelos LoRA**
+
+| Modelo | Tamaño | Épocas | Loss Final | Tiempo | Calidad de Respuesta |
+|--------|--------|--------|------------|--------|---------------------|
+| **Phi-2** 🥇 | 2.7B | 15 | **0.818** | ~60 min | ⭐⭐⭐⭐⭐ Excelente estructura, código Python |
+| **Llama-3.2-1B** 🥈 | 1B | 10 | **0.858** | ~15 min | ⭐⭐⭐⭐ Tono pedagógico perfecto, emojis |
+| **TinyLlama** | 1.1B | 20 | **1.157** | ~40 min | ⭐⭐⭐ Funcional pero menos coherente |
+
+### **Análisis de Calidad**
+
+**🥇 Phi-2 (Recomendado para producción)**
+- ✅ Mejor loss (0.818)
+- ✅ Respuestas estructuradas con ejemplos de código
+- ✅ Explicaciones técnicas precisas
+- ⚠️ Tiempo de inferencia medio (~3-4s)
+
+**🥈 Llama-3.2-1B (Mejor balance)**
+- ✅ Excelente tono pedagógico con emojis
+- ✅ Respuestas motivadoras y amigables
+- ✅ Inferencia rápida (~1-2s)
+- 💡 Con 15 épocas podría superar a Phi-2
+
+**TinyLlama (Desarrollo/Testing)**
+- ✅ Más rápido en inferencia (~1s)
+- ⚠️ Respuestas menos coherentes
+- ⚠️ Loss más alto (1.157)
+
+### **Recomendación**
+- **Producción**: Phi-2 (mejor calidad general)
+- **Desarrollo rápido**: Llama-3.2-1B (balance calidad/velocidad)
+- **Testing**: TinyLlama (más ligero)
 
 ---
 
@@ -318,30 +360,6 @@ Este proyecto incluye modelos fine-tuned usando **PEFT (Parameter-Efficient Fine
 - **Adaptadores LoRA**: Guardados en `fine_tuning/lora_adapters/`
 
 Ver notebooks completos en `fine_tuning/notebooks/`
-
----
-
-## 🤝 Contribuir
-
-```bash
-# 1. Fork el proyecto
-# 2. Crear rama feature
-git checkout -b feature/nueva-funcionalidad
-
-# 3. Commit cambios
-git commit -m "Add: nueva funcionalidad"
-
-# 4. Push a la rama
-git push origin feature/nueva-funcionalidad
-
-# 5. Abrir Pull Request
-```
-
----
-
-## 📄 Licencia
-
-MIT License - ver [LICENSE](LICENSE) para más detalles
 
 ---
 
