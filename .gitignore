@@ -1,0 +1,101 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite3
+
+# Models (si descargas modelos localmente)
+*.bin
+*.safetensors
+
+# FAISS indices (si persistes el índice)
+storage/
+*.faiss
+*.index
+
+# Jupyter
+#.ipynb_checkpoints/
+#*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Redis dump
+dump.rdb
+
+# Storage (FAISS indices)
+storage/
+
+# Presentations generadas
+presentations/*.pptx
+!presentations/.gitkeep
+
+# Backups
+main_v4_rag_backup.py
+main copy.py
+*.backup.py
+
+# Fine-tuning outputs (solo ignora outputs, no notebooks)
+fine_tuning/logs/
+fine_tuning/lora_model/
+fine_tuning/lora_adapters/*
+!fine_tuning/lora_adapters/.gitkeep
+fine_tuning/wandb/
+fine_tuning/*.zip
+fine_tuning/*.pth
+fine_tuning/*.bin
+fine_tuning/*.safetensors
+
+# Temporal
+*.tmp
+*.temp
+
+# Docker
+.dockerignore
