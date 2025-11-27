@@ -5,7 +5,6 @@
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.0-green.svg)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
@@ -272,21 +271,6 @@ nexus-agent-ai-education/
 | Supabase | ✅ 500MB | $0 |
 | Railway | ✅ $5 crédito | $20 |
 | **Total** | | **~$25-35/mes** |
-
----
-
-## 🧪 Testing
-
-```bash
-# Ejecutar tests
-pytest
-
-# Con coverage
-pytest --cov=app
-
-# Test específico
-pytest test/test_rag.py
-```
 
 ---
 

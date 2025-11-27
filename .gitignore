@@ -51,7 +51,7 @@ logs/
 
 # Models (si descargas modelos localmente)
 *.bin
-*.safetensors
+# *.safetensors
 
 # FAISS indices (si persistes el índice)
 storage/
@@ -85,13 +85,13 @@ main copy.py
 # Fine-tuning outputs (solo ignora outputs, no notebooks)
 fine_tuning/logs/
 fine_tuning/lora_model/
-fine_tuning/lora_adapters/*
-!fine_tuning/lora_adapters/.gitkeep
+# fine_tuning/lora_adapters/*
+# !fine_tuning/lora_adapters/.gitkeep
 fine_tuning/wandb/
 fine_tuning/*.zip
 fine_tuning/*.pth
-fine_tuning/*.bin
-fine_tuning/*.safetensors
+# fine_tuning/*.bin
+# fine_tuning/*.safetensors
 
 # Temporal
 *.tmp
