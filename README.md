@@ -225,9 +225,9 @@ nexus-agent-ai-education/
 ├── fine_tuning/                # Fine-tuning LoRA
 │   ├── dataset_pedagogico.json  # Dataset de 30 ejemplos pedagógicos
 │   ├── lora_adapters/          # Adaptadores entrenados (30 ejemplos, GPU T4)
-│   │   ├── lora_adapters_tinyllama/  # TinyLlama 1.1B - 20 épocas (Loss: 1.157)
-│   │   ├── lora_adapters_phi2/       # Phi-2 2.7B - 15 épocas (Loss: 0.818) 🥇
-│   │   └── lora_adapters_llama3/     # Llama-3.2-1B - 10 épocas (Loss: 0.858)
+│   │   ├── lora_adapters_tinyllama/  # TinyLlama 1.1B - 20 épocas (Loss: 1.156)
+│   │   ├── lora_adapters_phi2/       # Phi-2 2.7B - 15 épocas (Loss: 0.825) 🥈
+│   │   └── lora_adapters_llama3/     # Llama-3.2-1B - 15 épocas (Loss: 0.473) 🥇
 │   └── notebooks/              # Notebooks de entrenamiento
 │       └── ENTRENAMIENTO_COMPARATIVO.ipynb
 ├── presentations/              # PPTs generados
@@ -246,33 +246,44 @@ nexus-agent-ai-education/
 
 | Modelo | Tamaño | Épocas | Loss Final | Tiempo | Calidad de Respuesta |
 |--------|--------|--------|------------|--------|---------------------|
-| **Phi-2** 🥇 | 2.7B | 15 | **0.818** | ~60 min | ⭐⭐⭐⭐⭐ Excelente estructura, código Python |
-| **Llama-3.2-1B** 🥈 | 1B | 10 | **0.858** | ~15 min | ⭐⭐⭐⭐ Tono pedagógico perfecto, emojis |
-| **TinyLlama** | 1.1B | 20 | **1.157** | ~40 min | ⭐⭐⭐ Funcional pero menos coherente |
+| **Llama-3.2-1B** 🥇 | 1B | 15 | **0.473** | ~20 min | ⭐⭐⭐⭐⭐ Tono pedagógico perfecto, emojis, coherente |
+| **Phi-2** 🥈 | 2.7B | 15 | **0.825** | ~60 min | ⭐⭐⭐⭐ Excelente estructura, código Python |
+| **TinyLlama** | 1.1B | 20 | **1.156** | ~40 min | ⭐⭐⭐ Funcional pero menos coherente |
 
 ### **Análisis de Calidad**
 
-**🥇 Phi-2 (Recomendado para producción)**
-- ✅ Mejor loss (0.818)
-- ✅ Respuestas estructuradas con ejemplos de código
-- ✅ Explicaciones técnicas precisas
-- ⚠️ Tiempo de inferencia medio (~3-4s)
+**🥇 Llama-3.2-1B (GANADOR - Recomendado para producción)**
+- ✅ **Mejor loss (0.473)** - 43% mejor que Phi-2
+- ✅ Tono pedagógico perfecto con emojis apropiados
+- ✅ Respuestas motivadoras, claras y estructuradas
+- ✅ **Inferencia rápida** (~1-2s) - 2x más rápido que Phi-2
+- ✅ **Modelo más ligero** (1B vs 2.7B)
+- ✅ Excelente balance calidad/velocidad/recursos
 
-**🥈 Llama-3.2-1B (Mejor balance)**
-- ✅ Excelente tono pedagógico con emojis
-- ✅ Respuestas motivadoras y amigables
-- ✅ Inferencia rápida (~1-2s)
-- 💡 Con 15 épocas podría superar a Phi-2
+**🥈 Phi-2 (Alternativa robusta)**
+- ✅ Respuestas estructuradas con ejemplos de código Python
+- ✅ Explicaciones técnicas precisas
+- ⚠️ Loss más alto (0.825) que Llama-3.2
+- ⚠️ Tiempo de inferencia medio (~3-4s)
+- ⚠️ Modelo más pesado (2.7B parámetros)
 
 **TinyLlama (Desarrollo/Testing)**
 - ✅ Más rápido en inferencia (~1s)
 - ⚠️ Respuestas menos coherentes
-- ⚠️ Loss más alto (1.157)
+- ⚠️ Loss significativamente más alto (1.156)
 
-### **Recomendación**
-- **Producción**: Phi-2 (mejor calidad general)
-- **Desarrollo rápido**: Llama-3.2-1B (balance calidad/velocidad)
-- **Testing**: TinyLlama (más ligero)
+### **Recomendación para Producción**
+
+**🎯 Usa Llama-3.2-1B porque:**
+1. **Mejor calidad** (loss 0.473 vs 0.825 de Phi-2)
+2. **Más rápido** (1-2s vs 3-4s)
+3. **Menos recursos** (1B vs 2.7B parámetros)
+4. **Mejor UX** (tono pedagógico + emojis)
+5. **Costos menores** en inferencia
+
+**Phi-2 solo si:**
+- Necesitas ejemplos de código Python extensos
+- Prefieres respuestas más técnicas/formales
 
 ---
 

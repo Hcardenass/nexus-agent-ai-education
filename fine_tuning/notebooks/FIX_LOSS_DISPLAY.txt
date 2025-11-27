@@ -1,0 +1,73 @@
+🔧 FIX PARA MOSTRAR EL LOSS FINAL CORRECTAMENTE
+================================================
+
+PROBLEMA: El loss final muestra "N/A" en lugar del valor real
+
+SOLUCIÓN: Reemplaza la sección de captura del loss en la función train_model()
+
+BUSCA ESTAS LÍNEAS (alrededor de la línea 190-200):
+
+    # ENTRENAR
+    trainer.train()
+
+    print("\n" + "=" * 70)
+    print(f"✅ COMPLETADO - {model_config['display_name']}")
+    print("=" * 70)
+
+    # ✅ FIX: Buscar el último loss en el historial
+    final_loss = None
+    for log_entry in reversed(trainer.state.log_history):
+        if 'loss' in log_entry:
+            final_loss = log_entry['loss']
+            break
+
+    if final_loss is None:
+        final_loss = 'N/A'
+
+    print(f"\n📊 Loss final: {final_loss if isinstance(final_loss, str) else f'{final_loss:.4f}'}")
+
+
+REEMPLÁZALAS POR:
+
+    # ENTRENAR
+    train_result = trainer.train()
+
+    print("\n" + "=" * 70)
+    print(f"✅ COMPLETADO - {model_config['display_name']}")
+    print("=" * 70)
+
+    # ✅ MEJORADO: Múltiples formas de obtener el loss final
+    final_loss = None
+    
+    # Método 1: Desde train_result
+    if hasattr(train_result, 'training_loss'):
+        final_loss = train_result.training_loss
+    
+    # Método 2: Desde log_history (buscar último loss)
+    if final_loss is None and hasattr(trainer.state, 'log_history'):
+        for log_entry in reversed(trainer.state.log_history):
+            if 'loss' in log_entry:
+                final_loss = log_entry['loss']
+                break
+    
+    # Método 3: Desde el último log con train_loss
+    if final_loss is None and hasattr(trainer.state, 'log_history'):
+        for log_entry in reversed(trainer.state.log_history):
+            if 'train_loss' in log_entry:
+                final_loss = log_entry['train_loss']
+                break
+    
+    if final_loss is None:
+        final_loss = 'N/A'
+    
+    print(f"\n📊 Loss final: {final_loss if isinstance(final_loss, str) else f'{final_loss:.4f}'}")
+
+
+CAMBIOS CLAVE:
+1. Cambiar "trainer.train()" por "train_result = trainer.train()"
+2. Agregar 3 métodos para capturar el loss (training_loss, loss, train_loss)
+
+Esto debería mostrar los valores correctos:
+- TinyLlama: 1.1559
+- Phi-2: 0.8247
+- Llama-3.2: 0.4729 🥇

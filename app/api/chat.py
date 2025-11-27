@@ -199,7 +199,7 @@ async def chat_tuned(request: ChatRequest):
             cached_in_redis=cached,
             logged_in_postgres=logged,
             rag_used=True,
-            llm_provider="TinyLlama + LoRA"
+            llm_provider="Llama-3.2-1B + LoRA"
         )
     except HTTPException:
         raise

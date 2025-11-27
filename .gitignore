@@ -73,13 +73,11 @@ dump.rdb
 # Storage (FAISS indices)
 storage/
 
-# Presentations generadas
-presentations/*.pptx
+# Presentations 
+
 !presentations/.gitkeep
 
 # Backups
-main_v4_rag_backup.py
-main copy.py
 *.backup.py
 
 # Fine-tuning outputs (solo ignora outputs, no notebooks)
