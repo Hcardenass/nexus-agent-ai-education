@@ -10,11 +10,15 @@ Arquitectura modular con:
 ✅ Utilidades reutilizables
 """
 
+import warnings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 import datetime
+
+# Suprimir FutureWarning de google-generativeai (deprecado pero necesario para Supabase)
+warnings.filterwarnings("ignore", category=FutureWarning, module="llama_index.llms.gemini.base")
 
 # Cargar variables de entorno ANTES de importar servicios
 load_dotenv()
@@ -99,6 +103,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",              # Frontend local alternativo
         "https://*.vercel.app",               # Vercel deployments
         "https://edu-nexus.vercel.app",       # Producción (cambiar después)
+        "*",                                   # TEMPORAL: Permite todos (quitar después de probar)
     ],
     allow_credentials=True,
     allow_methods=["*"],

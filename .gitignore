@@ -1,4 +1,6 @@
-# Python
+# ============================================================================
+# PYTHON
+# ============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -20,80 +22,123 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual Environment
+# ============================================================================
+# VIRTUAL ENVIRONMENT
+# ============================================================================
 .venv/
 venv/
 ENV/
 env/
 
-# Environment variables
+# ============================================================================
+# ENVIRONMENT VARIABLES (CRÍTICO - NUNCA SUBIR)
+# ============================================================================
 .env
 .env.local
+.env.production
 
+# ============================================================================
 # IDE
+# ============================================================================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
+# ============================================================================
 # OS
+# ============================================================================
 .DS_Store
 Thumbs.db
 
-# Logs
+# ============================================================================
+# LOGS
+# ============================================================================
 *.log
 logs/
 
-# Database
+# ============================================================================
+# DATABASE
+# ============================================================================
 *.db
 *.sqlite3
 
-# Models (si descargas modelos localmente)
-*.bin
-# *.safetensors
+# ============================================================================
+# REDIS
+# ============================================================================
+dump.rdb
 
-# FAISS indices (si persistes el índice)
-storage/
-*.faiss
-*.index
-
-# Jupyter
-#.ipynb_checkpoints/
-#*.ipynb
-
-# Testing
+# ============================================================================
+# TESTING
+# ============================================================================
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Redis dump
-dump.rdb
-
-# Storage (FAISS indices)
+# ============================================================================
+# STORAGE - FAISS INDICES (Archivos grandes generados automáticamente)
+# ============================================================================
+# Ignorar toda la carpeta storage excepto los sílabos .txt
 storage/
+!storage/*/*.txt
 
-# Presentations 
+# ============================================================================
+# FINE-TUNING - MODELOS LORA (Archivos muy grandes - NO SUBIR)
+# ============================================================================
+# Adaptadores LoRA entrenados (varios GB)
+fine_tuning/lora_adapters/lora_adapters_llama3_v5/
+fine_tuning/lora_adapters/lora_adapters_phi2/
+fine_tuning/lora_adapters/lora_adapters_tinyllama/
+# Mantener solo .gitkeep para estructura
+!fine_tuning/lora_adapters/.gitkeep
 
-!presentations/.gitkeep
-
-# Backups
-*.backup.py
-
-# Fine-tuning outputs (solo ignora outputs, no notebooks)
+# Logs y outputs de entrenamiento
 fine_tuning/logs/
 fine_tuning/lora_model/
-# fine_tuning/lora_adapters/*
-# !fine_tuning/lora_adapters/.gitkeep
 fine_tuning/wandb/
 fine_tuning/*.zip
 fine_tuning/*.pth
-# fine_tuning/*.bin
-# fine_tuning/*.safetensors
 
-# Temporal
+# Modelos base descargados (muy grandes)
+*.bin
+*.safetensors
+
+# ============================================================================
+# RAGAS EVALUATION (Archivos generados - NO SUBIR)
+# ============================================================================
+ragas_evaluation_results.csv
+ragas_human_review_required.csv
+
+# ============================================================================
+# PRESENTATIONS (Generadas dinámicamente)
+# ============================================================================
+presentations/*.pptx
+!presentations/.gitkeep
+
+# ============================================================================
+# JUPYTER NOTEBOOKS
+# ============================================================================
+.ipynb_checkpoints/
+# Mantener notebooks de fine-tuning para documentación
+!fine_tuning/notebooks/*.ipynb
+
+# ============================================================================
+# BACKUPS Y TEMPORALES
+# ============================================================================
+*.backup.py
 *.tmp
 *.temp
 
-# Docker
+# ============================================================================
+# DOCKER (No necesario en repo)
+# ============================================================================
 .dockerignore
+
+# ============================================================================
+# ELASTIC BEANSTALK (Configuración local)
+# ============================================================================
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+.ebignore

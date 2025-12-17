@@ -15,7 +15,7 @@ class LoRAModel:
     
     def __init__(
         self, 
-        adapters_path: str = "./fine_tuning/lora_adapters/lora_adapters_llama3",
+        adapters_path: str = "./fine_tuning/lora_adapters/lora_adapters_llama3_v5",
         base_model_name: str = "meta-llama/Llama-3.2-1B-Instruct"
     ):
         self.model = None
@@ -114,34 +114,36 @@ class LoRAModel:
         
         # Construir prompt según el modelo
         if "llama" in self.base_model_name.lower():
-            # Formato Llama-3.2 con chat template
-            system_message = """Eres un asistente educativo experto. Responde SIEMPRE en español con tono pedagógico, motivador y amigable. Usa emojis apropiados.
-
-REGLAS IMPORTANTES:
-1. Usa ÚNICAMENTE la información del "Contexto del Sílabo" proporcionado
-2. NO inventes información que no esté en el contexto
-3. Si el contexto no tiene la información, di que no está disponible
-4. Sé preciso y directo con la información del sílabo"""
+            # ✅ V5: FORMATO EXACTO DEL ENTRENAMIENTO
+            # El modelo fue entrenado con este formato específico:
+            # system: "Eres un asistente educativo experto. Responde SIEMPRE en español..."
+            # user: "{instruction}\n\n{input}"
+            # donde input = "CONTEXTO: ...\n\nPREGUNTA: ..."
             
+            system_message = "Eres un asistente educativo experto. Responde SIEMPRE en español con tono pedagógico, motivador y amigable. Usa emojis apropiados."
+            
+            # Formatear input EXACTAMENTE como en el dataset de entrenamiento
             if context:
-                user_content = f"""{instruction}
-
-Contexto del Sílabo:
-{context}
-
-Pregunta del estudiante: {input_text}
-
-Responde basándote ÚNICAMENTE en el contexto del sílabo proporcionado arriba."""
+                # Extraer solo la información relevante del contexto (no todo el sílabo)
+                # El dataset fue entrenado con contextos cortos y específicos
+                user_input = f"CONTEXTO: {context[:500]}\n\nPREGUNTA: {input_text}"
             else:
-                user_content = f"{instruction}\n\n{input_text}"
+                user_input = input_text
             
-            prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
-
-{system_message}<|eot_id|><|start_header_id|>user<|end_header_id|>
-
-{user_content}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
-"""
+            # Combinar instruction + input (formato del dataset)
+            user_content = f"{instruction}\n\n{user_input}"
+            
+            # ✅ MÉTODO OFICIAL: tokenizer.apply_chat_template()
+            messages = [
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_content}
+            ]
+            
+            prompt = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True
+            )
         else:
             # Formato estándar (Phi-2 / TinyLlama)
             spanish_instruction = f"{instruction}\n\nIMPORTANTE: Responde SIEMPRE en español. Usa un tono pedagógico, motivador y amigable. Incluye emojis cuando sea apropiado."
@@ -160,17 +162,19 @@ Responde basándote ÚNICAMENTE en el contexto del sílabo proporcionado arriba.
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024)
         input_length = inputs['input_ids'].shape[1]  # Guardar longitud del prompt
         
-        # Generar con parámetros optimizados para reducir alucinaciones
+        # Generar con parámetros OPTIMIZADOS para V5
+        # V5: Loss 0.084, entrenado con dataset híbrido de 380 ejemplos
         with torch.no_grad():
             outputs = self.model.generate(
-                **inputs,
+                input_ids=inputs["input_ids"],
+                attention_mask=inputs["attention_mask"],
                 max_new_tokens=max_tokens,
-                temperature=0.3,  # Reducido de 0.7 para ser más determinístico
                 do_sample=True,
-                top_p=0.85,  # Reducido de 0.9 para ser más conservador
-                repetition_penalty=1.3,  # Aumentado de 1.2 para evitar repeticiones
+                temperature=0.7,  # ✅ V5: Igual que en pruebas del notebook
+                top_p=0.9,        # ✅ V5: Igual que en pruebas del notebook
+                repetition_penalty=1.1,  # ✅ V5: Igual que en pruebas del notebook
                 pad_token_id=self.tokenizer.eos_token_id,
-                no_repeat_ngram_size=3  # Evitar repetir frases de 3 palabras
+                eos_token_id=self.tokenizer.eos_token_id,
             )
         
         # Decodificar solo los tokens nuevos (sin el prompt)
@@ -179,6 +183,9 @@ Responde basándote ÚNICAMENTE en el contexto del sílabo proporcionado arriba.
         
         # Limpiar tokens especiales manualmente si quedaron
         response = response.replace("<|eot_id|>", "").replace("<|end_of_text|>", "").strip()
+        
+        # ⚠️ POST-PROCESAMIENTO MÍNIMO (solo tokens especiales)
+        # Si el modelo está bien entrenado, NO debería necesitar más correcciones
         
         # Si la respuesta está vacía, usar método alternativo
         if not response or len(response) < 5:
@@ -201,11 +208,24 @@ Responde basándote ÚNICAMENTE en el contexto del sílabo proporcionado arriba.
 
 
 # Instancia global (se cargará al iniciar la API)
-# 🥇 Usando Llama-3.2-1B (Loss: 0.473) - GANADOR con fix de device_map
-# Alternativas:
-#   - Phi-2: adapters_path="./fine_tuning/lora_adapters/lora_adapters_phi2", base_model_name="microsoft/phi-2"
-#   - TinyLlama: adapters_path="./fine_tuning/lora_adapters/lora_adapters_tinyllama", base_model_name="TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+# 🥇 Usando Llama-3.2-1B V4 (Loss: 0.2427) - MÉTODO OFICIAL tokenizer.apply_chat_template() ⭐⭐⭐⭐
+# Entrenado con 79 ejemplos usando método oficial de PEFT en 12 épocas
+# V4 MEJORADO (Re-entrenar con estos parámetros):
+#   Epochs: 20 (antes 12)
+#   Learning rate: 2e-5 (antes 5e-5)
+#   Loss objetivo: 0.10-0.15 (actual: 0.2427)
+#   
+# Mejoras vs V3:
+#   ✅ Usa tokenizer.apply_chat_template() (método oficial)
+#   ✅ Prompt idéntico al entrenamiento
+#   ⚠️ Loss 0.2427 aún alto - necesita re-entrenamiento
+#
+# Versiones anteriores:
+#   - V4 actual (Loss: 0.2427): Errores en fechas y mayúsculas
+#   - V3 (Loss: 0.228): Prompt manual, muchos errores tipográficos
+#   - V2 (Loss: 0.022): Overfitting severo, caracteres corruptos
+#   - V1 (Loss: 0.1276): Primera versión
 lora_model = LoRAModel(
-    adapters_path="./fine_tuning/lora_adapters/lora_adapters_llama3",
+    adapters_path="./fine_tuning/lora_adapters/lora_adapters_llama3_v5",
     base_model_name="meta-llama/Llama-3.2-1B-Instruct"
 )

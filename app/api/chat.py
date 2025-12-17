@@ -141,29 +141,36 @@ async def chat_tuned(request: ChatRequest):
             task_type = detect_task_type(request.message)
             print(f"🎯 Tipo de tarea detectada: {task_type}")
             
-            # Consultar RAG para obtener contexto
-            print(f"\n🔍 RAG QUERY:")
+            # Obtener contexto RAW de los source nodes (sin generar respuesta con Gemini)
+            print(f"\n🔍 RAG CONTEXT EXTRACTION:")
             print(f"   Pregunta: {request.message}")
-            print(f"   Buscando en FAISS...")
+            print(f"   Buscando fragmentos relevantes en FAISS...")
             
-            # Obtener contexto del RAG
-            rag_response = rag_engine.query_rag_engine(
+            # Usar la nueva función que devuelve solo el contexto
+            context = rag_engine.get_rag_context(
                 user_message=request.message,
                 history=history,
-                task_type=task_type
+                max_chars=2000
             )
-            context = str(rag_response)[:1000]  # Limitar contexto
             
             print(f"   ✅ Contexto obtenido ({len(context)} chars)")
+            if context:
+                print(f"   📄 Preview: {context[:200]}...")
+                print(f"   📄 CONTEXTO COMPLETO:\n{context}\n")  # DEBUG: Ver contexto completo
+            else:
+                print(f"   ⚠️  No se encontró contexto relevante")
             
             # 4. Generar respuesta con LoRA
             print(f"\n🔧 Generando respuesta con LoRA...")
             
-            instruction = f"Responde como un profesor pedagógico y motivador. Tipo de tarea: {task_type}"
+            # Reformular pregunta para obtener respuesta más detallada
+            enhanced_question = f"{request.message}\n\nPor favor, proporciona una respuesta completa incluyendo todos los detalles y puntos mencionados en el contexto."
+            
+            instruction = f"Eres un asistente educativo. Responde basándote ÚNICAMENTE en el CONTEXTO proporcionado."
             
             bot_response = lora_model.generate(
                 instruction=instruction,
-                input_text=request.message,
+                input_text=enhanced_question,
                 context=context,
                 max_tokens=500
             )

@@ -17,6 +17,17 @@ embedding_provider = None
 rag_status = "❌ not initialized"
 
 # ============================================================================
+# CONFIGURACIÓN RAG (Centralizada)
+# ============================================================================
+
+# Parámetros de chunking
+CHUNK_SIZE = 1024  # Tamaño de cada fragmento (estándar de la industria)
+CHUNK_OVERLAP = 100  # Overlap entre chunks (~10%)
+
+# Parámetros de retrieval
+SIMILARITY_TOP_K = 3  # Cantidad de fragmentos similares a retornar
+
+# ============================================================================
 # INICIALIZACIÓN DE EMBEDDINGS
 # ============================================================================
 
@@ -200,8 +211,8 @@ def configure_llamaindex():
         
         Settings.llm = llm_instance
         Settings.embed_model = embed_model
-        Settings.chunk_size = 512
-        Settings.chunk_overlap = 50
+        Settings.chunk_size = CHUNK_SIZE
+        Settings.chunk_overlap = CHUNK_OVERLAP
         
         print("   ✅ LlamaIndex configurado")
         return True
@@ -228,6 +239,10 @@ def get_llm_provider() -> str:
 def get_embedding_provider() -> str:
     """Retorna el nombre del proveedor de embeddings"""
     return embedding_provider or "none"
+
+def get_similarity_top_k() -> int:
+    """Retorna el valor de similarity_top_k para RAG"""
+    return SIMILARITY_TOP_K
 
 def get_status() -> str:
     """Retorna el estado del RAG"""

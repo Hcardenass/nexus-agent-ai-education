@@ -13,43 +13,47 @@ requests==2.32.4
 # ============================================================================
 # RAG ENGINE (Fase 4)
 # ============================================================================
-# LlamaIndex Core
-llama-index-core==0.10.0
+# LlamaIndex Core - Versión compatible con todos los integradores
+llama-index-core>=0.10.11
 
 # Embeddings
-sentence-transformers==2.2.2
-faiss-cpu==1.7.4
+sentence-transformers>=2.2.2
+faiss-cpu>=1.7.4
 
 # OpenAI (Recomendado - Instalar primero)
-openai==1.12.0
-llama-index-llms-openai==0.1.5
-llama-index-embeddings-openai==0.1.6
+openai>=1.12.0
+llama-index-llms-openai>=0.1.5
+llama-index-embeddings-openai>=0.1.6
 
-# Google Gemini (Nuevo)
-google-generativeai==0.3.2
-llama-index-llms-gemini==0.1.5
+# Google Gemini (Usando versión compatible con Supabase)
+google-generativeai>=0.3.2
+llama-index-llms-gemini>=0.1.5
 
 # HuggingFace (Alternativa gratis)
-llama-index-llms-huggingface==0.1.3
-llama-index-embeddings-huggingface==0.1.4
+# Comentado temporalmente - causa conflictos de versiones
+# llama-index-llms-huggingface>=0.1.3
+# llama-index-embeddings-huggingface>=0.1.4
 
 # ============================================================================
 # LLAMA 3 LOCAL (Comentado - Solo instalar cuando tengas espacio)
 # ============================================================================
-# transformers==4.35.2
-# torch==2.1.1
+# transformers>=4.35.2
+# torch>=2.1.1
+# accelerate>=0.25.0
+# bitsandbytes>=0.41.3
 # accelerate==0.25.0
 # bitsandbytes==0.41.3
 
 # ============================================================================
-# LORA FINE-TUNING (Ya instalado en tu entorno)
+# LORA FINE-TUNING (Usado en app/core/lora_integration.py para /chat-tuned)
 # ============================================================================
-transformers==4.31.0
-torch==2.9.1
-accelerate==1.12.0
-peft==0.4.0
-safetensors==0.7.0
-tokenizers==0.13.3
+# NOTA: Estas versiones son para PRODUCCIÓN (CPU)
+# En Colab usas versiones más nuevas con GPU
+transformers>=4.35.0
+torch>=2.0.0
+accelerate>=0.25.0
+peft>=0.7.0
+safetensors>=0.4.0
 
 # ============================================================================
 # PRESENTATIONS
@@ -63,3 +67,14 @@ PyPDF2==3.0.1
 Jinja2==3.1.6
 PyYAML==6.0.3
 tqdm==4.67.1
+pandas>=2.0.0
+
+# ============================================================================
+# RAGAS EVALUATION (Para evaluar RAG)
+# ============================================================================
+ragas
+langchain
+langchain-openai
+datasets
+nest-asyncio
+

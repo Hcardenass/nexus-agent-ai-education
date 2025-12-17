@@ -1,12 +1,13 @@
 """
-RAG Engine - Motor de Retrieval Augmented Generation
-Gestiona múltiples sílabos y consultas inteligentes
+RAG Engine - Sistema de Recuperación Aumentada de Generación
+Gestiona índices FAISS para cada sílabo
 """
 
 import time
 from pathlib import Path
-from typing import List, Dict, Optional
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext, load_index_from_storage
+from typing import Optional, Dict, List
+from llama_index.core import VectorStoreIndex, StorageContext, load_index_from_storage
+from app.services import llm_service
 
 # ============================================================================
 # VARIABLES GLOBALES
@@ -44,7 +45,7 @@ def init_syllabi():
                 continue
             
             syllabus_id = syllabus_dir.name
-            storage_dir = str(syllabus_dir)
+            storage_dir = syllabus_dir  # Mantener como Path, no convertir a string
             
             # Buscar archivo .txt del sílabo
             txt_files = list(syllabus_dir.glob("silabo_*.txt"))
@@ -69,15 +70,35 @@ def init_syllabi():
             
             print(f"   📄 Procesando: {syllabus_name}")
             
-            # Cargar índice existente
+            # Verificar si existe índice
+            index_exists = (storage_dir / "docstore.json").exists()
+            
             try:
-                print(f"      📦 Cargando índice existente...")
-                storage_context = StorageContext.from_defaults(persist_dir=storage_dir)
-                index = load_index_from_storage(storage_context)
+                if index_exists:
+                    # Cargar índice existente
+                    print(f"      📦 Cargando índice existente...")
+                    storage_context = StorageContext.from_defaults(persist_dir=str(storage_dir))
+                    index = load_index_from_storage(storage_context)
+                else:
+                    # Crear nuevo índice
+                    print(f"      🔨 Creando nuevo índice (chunk_size=1024)...")
+                    from llama_index.core import SimpleDirectoryReader
+                    
+                    # Leer documento
+                    documents = SimpleDirectoryReader(
+                        input_files=[str(silabo_file)]
+                    ).load_data()
+                    
+                    # Crear índice vectorial
+                    index = VectorStoreIndex.from_documents(documents)
+                    
+                    # Persistir índice
+                    index.storage_context.persist(persist_dir=str(storage_dir))
+                    print(f"      💾 Índice guardado")
                 
                 # Crear query engine
                 query_engine = index.as_query_engine(
-                    similarity_top_k=3,
+                    similarity_top_k=llm_service.get_similarity_top_k(),
                     response_mode="compact"
                 )
                 syllabi_indices[syllabus_id] = query_engine
@@ -89,7 +110,9 @@ def init_syllabi():
                 print(f"      ✅ Listo")
                 
             except Exception as e:
-                print(f"      ❌ Error al cargar {syllabus_id}: {e}")
+                print(f"      ❌ Error al procesar {syllabus_id}: {e}")
+                import traceback
+                traceback.print_exc()
         
         # Establecer sílabo por defecto
         if available_syllabi:
@@ -200,6 +223,56 @@ Responde basándote en el contenido del sílabo de {syllabus_name}."""
         print(f"   ❌ Error RAG: {e}")
         return f"Error: {str(e)[:100]}"
 
+
+def get_rag_context(
+    user_message: str,
+    history: List[Dict] = None,
+    syllabus_id: str = None,
+    max_chars: int = 2000
+) -> str:
+    """
+    Obtiene SOLO el contexto de los source nodes (sin generar respuesta con LLM)
+    Útil para LoRA que necesita el contexto crudo
+    
+    Args:
+        user_message: Pregunta del usuario
+        history: Historial de conversación
+        syllabus_id: ID del sílabo
+        max_chars: Máximo de caracteres a retornar
+        
+    Returns:
+        Contexto extraído de los source nodes
+    """
+    global current_syllabus
+    
+    active_syllabus = syllabus_id if syllabus_id else current_syllabus
+    
+    if not active_syllabus or active_syllabus not in syllabi_indices:
+        return ""
+    
+    query_engine = syllabi_indices[active_syllabus]
+    
+    try:
+        # Query simple para obtener source nodes
+        response = query_engine.query(user_message)
+        
+        # Extraer texto de los source nodes
+        if hasattr(response, 'source_nodes') and response.source_nodes:
+            context_parts = []
+            for node in response.source_nodes[:3]:  # Top 3 fragmentos
+                if hasattr(node, 'text'):
+                    context_parts.append(node.text)
+            
+            context = "\n\n".join(context_parts)
+            return context[:max_chars]
+        else:
+            # Fallback: usar la respuesta completa
+            return str(response)[:max_chars]
+            
+    except Exception as e:
+        print(f"   ❌ Error obteniendo contexto: {e}")
+        return ""
+
 # ============================================================================
 # GESTIÓN DE SÍLABOS
 # ============================================================================
@@ -268,7 +341,7 @@ def load_new_syllabus(
         
         # Crear query engine
         query_engine = index.as_query_engine(
-            similarity_top_k=3,
+            similarity_top_k=llm_service.get_similarity_top_k(),
             response_mode="compact"
         )
         

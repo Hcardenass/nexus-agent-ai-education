@@ -1,6 +1,6 @@
 # 🎓 Edu-Nexus: Asistente Académico con IA
 
-> Plataforma educativa inteligente que combina RAG (Retrieval Augmented Generation) con múltiples LLMs para generar automáticamente recursos pedagógicos: rúbricas, exámenes, planes de clase, presentaciones con imágenes AI, y más. Carga tus sílabos y deja que la IA cree contenido educativo personalizado.
+> Plataforma educativa inteligente que combina **RAG**, **fine-tuning con LoRA/PEFT**, y múltiples LLMs para crear recursos pedagógicos personalizados. **Entrena tu propio modelo educativo** que aprende de tus sílabos y genera automáticamente: rúbricas de evaluación, exámenes contextualizados, planes de clase estructurados, y presentaciones profesionales con imágenes generadas por IA. Respuestas precisas basadas en tu contenido, con el tono pedagógico que necesitas. 🎓🤖✨
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.0-green.svg)](https://fastapi.tiangolo.com/)
@@ -54,6 +54,34 @@
 - **DALL-E 2/3** - Generación de imágenes
 - **python-pptx** - Creación de presentaciones
 - **PEFT/LoRA** - Fine-tuning de modelos
+
+---
+
+## 🏗️ Arquitectura Técnica
+
+### **Pipeline RAG (Retrieval Augmented Generation)**
+- **Vector Store:** FAISS para búsqueda semántica ultra-rápida
+- **Embeddings:** OpenAI text-embedding-3-small / HuggingFace BGE
+- **Indexing:** LlamaIndex con chunking inteligente (512 tokens, overlap 50)
+- **Retrieval:** Top-3 fragmentos más relevantes por similitud coseno
+- **Multi-Source:** Gestión de múltiples sílabos con índices independientes
+- **Trazabilidad:** Source nodes con scores de similitud para cada respuesta
+
+### **Fine-Tuning Personalizado**
+- **LoRA/PEFT:** Adaptadores ligeros para Llama-3.2-1B (parámetros entrenables: ~0.75% del modelo)
+- **Dataset Pedagógico:** 51 ejemplos curados basados en tus sílabos reales (Cálculo, Data Science, Historia)
+- **Entrenamiento:** Google Colab con GPU gratuita (T4/L4) - 17 épocas en ~15 minutos
+- **Resultados:** Loss final de **0.1276** (excelente convergencia)
+- **Modelos Comparados:** TinyLlama (Loss: 1.11), Phi-2 (Loss: 0.69), Llama-3.2-1B (Loss: 0.13) ⭐
+- **Dual Mode:** RAG (respuestas precisas basadas en documentos) + LoRA (tono pedagógico personalizado)
+- **Optimización:** Cuantización 4-bit, gradient checkpointing, batch size adaptativo
+
+### **Flujo de Procesamiento**
+```
+Usuario → FastAPI → RAG Engine → FAISS (búsqueda) → LLM (generación) → Respuesta
+                  ↓
+            LoRA Model (opcional para tono pedagógico)
+```
 
 ---
 
