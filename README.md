@@ -4,7 +4,14 @@
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.0-green.svg)](https://fastapi.tiangolo.com/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![LlamaIndex](https://img.shields.io/badge/LlamaIndex-0.14-purple.svg)](https://www.llamaindex.ai/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4-412991.svg)](https://openai.com/)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5--Flash-4285F4.svg)](https://ai.google.dev/)
+[![FAISS](https://img.shields.io/badge/FAISS-Vector--DB-00ADD8.svg)](https://github.com/facebookresearch/faiss)
+[![LoRA](https://img.shields.io/badge/LoRA-PEFT-FF6B6B.svg)](https://github.com/huggingface/peft)
+[![Redis](https://img.shields.io/badge/Redis-Upstash-DC382D.svg)](https://upstash.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-336791.svg)](https://supabase.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
 ---
 
