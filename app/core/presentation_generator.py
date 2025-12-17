@@ -76,7 +76,7 @@ class PresentationGenerator:
     
     def _generate_image(self, prompt: str) -> BytesIO:
         """
-        Genera una imagen con DALL-E 2 basada en el prompt
+        Genera una imagen con DALL-E 3 basada en el prompt
         
         Args:
             prompt: Descripción de la imagen a generar

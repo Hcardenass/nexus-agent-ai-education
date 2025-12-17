@@ -113,7 +113,7 @@ ragas_human_review_required.csv
 # ============================================================================
 # PRESENTATIONS (Generadas dinámicamente)
 # ============================================================================
-presentations/*.pptx
+#presentations/*.pptx
 !presentations/.gitkeep
 
 # ============================================================================
