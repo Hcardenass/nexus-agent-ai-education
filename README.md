@@ -69,10 +69,10 @@
 
 ### **Fine-Tuning Personalizado**
 - **LoRA/PEFT:** Adaptadores ligeros para Llama-3.2-1B (parámetros entrenables: ~0.75% del modelo)
-- **Dataset Pedagógico:** 51 ejemplos curados basados en tus sílabos reales (Cálculo, Data Science, Historia)
-- **Entrenamiento:** Google Colab con GPU gratuita (T4/L4) - 17 épocas en ~15 minutos
-- **Resultados:** Loss final de **0.1276** (excelente convergencia)
-- **Modelos Comparados:** TinyLlama (Loss: 1.11), Phi-2 (Loss: 0.69), Llama-3.2-1B (Loss: 0.13) ⭐
+- **Dataset Pedagógico:** 500 ejemplos únicos curados basados en tus sílabos reales (Cálculo, Data Science, Historia)
+- **Entrenamiento:** Google Colab con GPU gratuita (T4/L4) - 9 épocas en ~20 minutos
+- **Resultados V5:** Loss final de **0.0841** (excelente convergencia - dataset híbrido optimizado)
+- **Modelos Comparados:** TinyLlama (Loss: 1.11), Phi-2 (Loss: 0.69), Llama-3.2-1B-V5 (Loss: 0.08) ⭐
 - **Dual Mode:** RAG (respuestas precisas basadas en documentos) + LoRA (tono pedagógico personalizado)
 - **Optimización:** Cuantización 4-bit, gradient checkpointing, batch size adaptativo
 
@@ -251,13 +251,15 @@ nexus-agent-ai-education/
 │   ├── data_science/
 │   └── historia/
 ├── fine_tuning/                # Fine-tuning LoRA
-│   ├── dataset_pedagogico.json  # Dataset de 30 ejemplos pedagógicos
-│   ├── lora_adapters/          # Adaptadores entrenados (30 ejemplos, GPU T4)
+│   ├── dataset_pedagogico_v2_500_unico.json  # Dataset de 500 ejemplos únicos
+│   ├── lora_adapters/          # Adaptadores entrenados (500 ejemplos, GPU T4)
 │   │   ├── lora_adapters_tinyllama/  # TinyLlama 1.1B - 20 épocas (Loss: 1.156)
 │   │   ├── lora_adapters_phi2/       # Phi-2 2.7B - 15 épocas (Loss: 0.825) 🥈
-│   │   └── lora_adapters_llama3/     # Llama-3.2-1B - 15 épocas (Loss: 0.473) 🥇
+│   │   └── lora_adapters_llama3_v5/  # Llama-3.2-1B-V5 - 9 épocas (Loss: 0.0841) 🥇
 │   └── notebooks/              # Notebooks de entrenamiento
-│       └── ENTRENAMIENTO_COMPARATIVO.ipynb
+│       ├── ENTRENAMIENTO_COMPARATIVO.ipynb
+│       ├── ENTRENAMIENTO_LLAMA3_V4_ipynb
+│       └── ENTRENAMIENTO_LLAMA3_V5.ipynb
 ├── presentations/              # PPTs generados
 ├── Dockerfile                  # Imagen Docker
 ├── docker-compose.yml          # Orquestación local
@@ -274,14 +276,15 @@ nexus-agent-ai-education/
 
 | Modelo | Tamaño | Épocas | Loss Final | Tiempo | Calidad de Respuesta |
 |--------|--------|--------|------------|--------|---------------------|
-| **Llama-3.2-1B** 🥇 | 1B | 15 | **0.473** | ~20 min | ⭐⭐⭐⭐⭐ Tono pedagógico perfecto, emojis, coherente |
+| **Llama-3.2-1B-V5** 🥇 | 1B | 9 | **0.0841** | ~20 min | ⭐⭐⭐⭐⭐ Tono pedagógico perfecto, emojis, coherente |
 | **Phi-2** 🥈 | 2.7B | 15 | **0.825** | ~60 min | ⭐⭐⭐⭐ Excelente estructura, código Python |
 | **TinyLlama** | 1.1B | 20 | **1.156** | ~40 min | ⭐⭐⭐ Funcional pero menos coherente |
 
 ### **Análisis de Calidad**
 
-**🥇 Llama-3.2-1B (GANADOR - Recomendado para producción)**
-- ✅ **Mejor loss (0.473)** - 43% mejor que Phi-2
+**🥇 Llama-3.2-1B-V5 (GANADOR - Recomendado para producción)**
+- ✅ **Mejor loss (0.0841)** - 90% mejor que Phi-2, 82% mejor que V4
+- ✅ **Dataset híbrido optimizado** - 500 ejemplos únicos sin duplicados
 - ✅ Tono pedagógico perfecto con emojis apropiados
 - ✅ Respuestas motivadoras, claras y estructuradas
 - ✅ **Inferencia rápida** (~1-2s) - 2x más rápido que Phi-2
@@ -291,7 +294,7 @@ nexus-agent-ai-education/
 **🥈 Phi-2 (Alternativa robusta)**
 - ✅ Respuestas estructuradas con ejemplos de código Python
 - ✅ Explicaciones técnicas precisas
-- ⚠️ Loss más alto (0.825) que Llama-3.2
+- ⚠️ Loss más alto (0.825) que Llama-3.2-V5
 - ⚠️ Tiempo de inferencia medio (~3-4s)
 - ⚠️ Modelo más pesado (2.7B parámetros)
 
@@ -302,12 +305,13 @@ nexus-agent-ai-education/
 
 ### **Recomendación para Producción**
 
-**🎯 Usa Llama-3.2-1B porque:**
-1. **Mejor calidad** (loss 0.473 vs 0.825 de Phi-2)
-2. **Más rápido** (1-2s vs 3-4s)
-3. **Menos recursos** (1B vs 2.7B parámetros)
-4. **Mejor UX** (tono pedagógico + emojis)
-5. **Costos menores** en inferencia
+**🎯 Usa Llama-3.2-1B-V5 porque:**
+1. **Mejor calidad** (loss 0.0841 vs 0.825 de Phi-2)
+2. **Dataset optimizado** (500 ejemplos únicos vs 30 anteriores)
+3. **Más rápido** (1-2s vs 3-4s)
+4. **Menos recursos** (1B vs 2.7B parámetros)
+5. **Mejor UX** (tono pedagógico + emojis)
+6. **Costos menores** en inferencia
 
 **Phi-2 solo si:**
 - Necesitas ejemplos de código Python extensos
